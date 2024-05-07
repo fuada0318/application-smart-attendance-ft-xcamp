@@ -5,6 +5,8 @@
     <color name="background">#000040</color>
     <color name="secondary">#9872F3</color>
     <color name="accent">#e2cdb4</color>
+    <color name="text2">#2F2D63</color>
+    <color name="gray">#FF9A9A9A</color>
 
     <dimen name="textS">14sp</dimen>
     <dimen name="textM">20sp</dimen>

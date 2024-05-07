@@ -26,8 +26,8 @@ class LoginPage : AppCompatActivity() {
             insets
         }
         btnLogin = findViewById(R.id.btnLogin)
-        dataUsername = findViewById(R.id.edtUsername)
-        dataPassword = findViewById(R.id.edtPasswd)
+        dataUsername = findViewById(R.id.getUsername)
+        dataPassword = findViewById(R.id.getPasswd)
         btnLogin.setOnClickListener(this)
         btnLogin.setOnClickListener {
             if(dataUsername.text.toString().equals("joko") && dataPassword.text.toString().equals("p")){

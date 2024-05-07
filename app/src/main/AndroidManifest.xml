@@ -13,6 +13,12 @@
         android:theme="@style/Theme.Pbl"
         tools:targetApi="31">
         <activity
+            android:name=".AttendanceLogUser"
+            android:exported="false" />
+        <activity
+            android:name=".AttendanceLogsUser"
+            android:exported="false" />
+        <activity
             android:name=".HomePageUser"
             android:exported="false" />
         <activity
