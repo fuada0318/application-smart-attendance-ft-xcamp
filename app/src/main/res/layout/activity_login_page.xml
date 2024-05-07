@@ -34,26 +34,38 @@
         android:textColorLink="#FFFFFF" />
 
     <EditText
-        android:id="@+id/edtUsername"
+        android:id="@+id/getUsername"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_marginLeft="100px"
-        android:layout_marginTop="30px"
+        android:layout_marginTop="50px"
         android:layout_marginRight="100px"
+        android:background="@drawable/custominput"
+        android:paddingStart="5dp"
+        android:drawablePadding="6dp"
+        android:drawableStart="@drawable/baseline_person"
         android:ems="10"
         android:fontFamily="@font/rubik"
-        android:inputType="text" />
+        android:inputType="text"
+        android:text="username"
+        android:textColor="#000000" />
 
     <EditText
-        android:id="@+id/edtPasswd"
+        android:id="@+id/getPasswd"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_marginLeft="100px"
         android:layout_marginTop="30px"
         android:layout_marginRight="100px"
+        android:paddingStart="5dp"
+        android:drawablePadding="6dp"
+        android:drawableStart="@drawable/lock_solid"
+        android:background="@drawable/custominput"
         android:ems="10"
         android:fontFamily="@font/rubik"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:text="password"
+        android:textColor="#000000" />
 
     <Button
         android:id="@+id/btnLogin"
@@ -72,14 +84,14 @@
 
         <ImageView
             android:id="@+id/imageView6"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.798"
+            app:layout_constraintVertical_bias="0.962"
             app:srcCompat="@drawable/logoxl" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>

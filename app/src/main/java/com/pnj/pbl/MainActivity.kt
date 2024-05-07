@@ -32,6 +32,6 @@ class MainActivity : AppCompatActivity() {
                 val pindahHalaman = Intent(applicationContext,LoginPage::class.java)
                 startActivity(pindahHalaman)
             }
-        },2500)
+        },1500)
     }
 }
