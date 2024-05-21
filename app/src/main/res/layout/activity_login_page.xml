@@ -21,6 +21,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/login" />
+
+        <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -34,37 +45,39 @@
         android:textColorLink="#FFFFFF" />
 
     <EditText
-        android:id="@+id/getUsername"
+        android:id="@+id/getEmail"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:layout_marginLeft="100px"
         android:layout_marginTop="50px"
         android:layout_marginRight="100px"
         android:background="@drawable/custominput"
-        android:paddingStart="5dp"
-        android:drawablePadding="6dp"
         android:drawableStart="@drawable/baseline_person"
+        android:drawablePadding="6dp"
         android:ems="10"
         android:fontFamily="@font/rubik"
-        android:inputType="text"
-        android:text="username"
-        android:textColor="#000000" />
+        android:hint="email"
+        android:inputType="textEmailAddress"
+        android:paddingStart="5dp"
+        android:textColor="#000000"
+        android:textColorHint="@color/gray" />
 
     <EditText
         android:id="@+id/getPasswd"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:layout_marginLeft="100px"
         android:layout_marginTop="30px"
         android:layout_marginRight="100px"
-        android:paddingStart="5dp"
-        android:drawablePadding="6dp"
-        android:drawableStart="@drawable/lock_solid"
         android:background="@drawable/custominput"
+        android:drawableStart="@drawable/lock_solid"
+        android:drawablePadding="6dp"
         android:ems="10"
         android:fontFamily="@font/rubik"
+        android:hint="password"
+        android:textColorHint="@color/gray"
         android:inputType="textPassword"
-        android:text="password"
+        android:paddingStart="5dp"
         android:textColor="#000000" />
 
     <Button
@@ -93,5 +106,4 @@
             app:layout_constraintVertical_bias="0.962"
             app:srcCompat="@drawable/logoxl" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </LinearLayout>

@@ -7,6 +7,8 @@
     <color name="accent">#e2cdb4</color>
     <color name="text2">#2F2D63</color>
     <color name="gray">#FF9A9A9A</color>
+<!--    <color name="green">#FF9A9A9A</color>-->
+<!--    <color name="orange">#FF9A9A9A</color>-->
 
     <dimen name="textS">14sp</dimen>
     <dimen name="textM">20sp</dimen>
