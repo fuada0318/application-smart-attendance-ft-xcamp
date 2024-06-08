@@ -1,7 +1,6 @@
 package com.pnj.pbl
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,8 +12,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.pnj.pbl.API.RetrofitClient
-import com.pnj.pbl.data.LoginResponse
+import com.pnj.pbl.api.RetrofitClient
+import com.pnj.pbl.data.PrefManager
+import com.pnj.pbl.data.ResponseLogin
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,6 +29,7 @@ class LoginPage : AppCompatActivity() {
 
     private var emailUser : String = ""
     private var passwordUser : String = ""
+    private lateinit var profil : PrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,64 +45,52 @@ class LoginPage : AppCompatActivity() {
         dataEmail = findViewById(R.id.getEmail)
         dataPassword = findViewById(R.id.getPasswd)
         progBar = findViewById(R.id.loading)
+        profil = PrefManager(this)
 
-        btnLogin.setOnClickListener(this)
         btnLogin.setOnClickListener {
             emailUser = dataEmail.text.toString()
             passwordUser = dataPassword.text.toString()
 
-            when {
-                emailUser == "" -> {
-                    dataEmail.error = "Email tidak boleh kosong"
-                }
-                passwordUser == "" -> {
-                    dataPassword.error = "Password tidak boleh kosong"
-                }
-                else -> {
-                    progBar.visibility = View.VISIBLE
-                    getLogin()
-                }
+            if (emailUser.isEmpty() || emailUser == ""){
+                dataEmail.error = "Email tidak boleh kosong"
+            } else if (!isValidEmail(emailUser)){
+                dataEmail.error = "Email tidak valid"
+            } else if (passwordUser.isEmpty() || passwordUser == ""){
+                dataPassword.error = "Password tidak boleh kosong"
+            } else{
+                progBar.visibility = View.VISIBLE
+                getLogin()
             }
         }
     }
 
     private fun getLogin() {
         val api = RetrofitClient().getDataUser()
-        api.postLogin(emailUser, passwordUser).enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+        api.postLogin(emailUser, passwordUser).enqueue(object : Callback<ResponseLogin> {
+            override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
                 if (response.isSuccessful) {
-                    if (response.body()?.operation_status != 1) {
-                        progBar.visibility = View.GONE
-                        showToast("Login Gagal!")
-                    } else {
-//                        val jwtToken : String = response.body()!!.token
+                    profil.setEmail(response.body()!!.data.user.email)
+                    profil.setName(response.body()!!.data.user.name)
+                    profil.setProfile(response.body()!!.data.user.profile_pict_url)
+                    profil.setId(response.body()!!.data.user.user_id)
+                    profil.setFloor(response.body()!!.data.user.floor)
+                    profil.setToken(response.body()!!.token)
+                    profil.setLogin(true)
 
-//                      Membuat Session
-//                        val loginResponse = LoginResponse.data.user
-                        getSharedPreferences("login_session", MODE_PRIVATE)
-                            .edit()
-                            .putString("email", response.body()?.data?.user?.email)
-                            .putInt("floor", response.body()?.data?.user?.floor!!)
-                            .putString("name", response.body()?.data?.user?.name)
-                            .putString("profile", response.body()?.data?.user?.profile_pict_url)
-                            .putInt("role", response.body()?.data?.user?.role!!)
-                            .putLong("id", response.body()?.data?.user?.user_id!!)
-                            .putString("jwt_token", response.body()?.token)
-                            .apply()
-
-                        progBar.visibility = View.GONE
-                        showToast("Login Berhasil!")
-                        startActivity(Intent(this@LoginPage, HomePage::class.java))
-                        finish()
-                    }
+                    progBar.visibility = View.GONE
+                    showToast("Login Berhasil!")
+                    startActivity(Intent(this@LoginPage, HomePage::class.java))
+                    finish()
                 } else {
-                    showToast("Login Error!")
-//                    val msgerr : Int = response.body()!!.operation_status
-//                    Toast.makeText(this@LoginPage, msgerr, Toast.LENGTH_LONG).show()
+                    progBar.visibility = View.GONE
+                    val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
+                    val msgerr = jsonObj.getString("message")
+
+                    showToast(msgerr)
                 }
             }
 
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
                 Log.e("Pesan error", "${t.message}")
             }
 
@@ -110,8 +100,9 @@ class LoginPage : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this@LoginPage, message, Toast.LENGTH_LONG).show()
     }
-}
 
-private fun Button.setOnClickListener(loginPage: LoginPage) {
-
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+        return emailRegex.matches(email)
+    }
 }

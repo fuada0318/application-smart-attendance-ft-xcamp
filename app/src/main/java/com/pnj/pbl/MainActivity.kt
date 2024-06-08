@@ -9,10 +9,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.pnj.pbl.data.PrefManager
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var profil : SharedPreferences
+    private lateinit var profil : PrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,18 +28,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkSession(){
-        val login : Boolean
 
-        profil = getSharedPreferences("login_session", MODE_PRIVATE)
-        if (profil.getString("jwt_token", null) != null){
-            login = true
-        } else{
-            login = false
-        }
-
+        profil = PrefManager(this)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (login){
+            if (profil.getLogin()){
                 val pindahHalaman = Intent(this,HomePage::class.java)
                 startActivity(pindahHalaman)
                 finish()

@@ -1,11 +1,7 @@
 package com.pnj.pbl.data
 
-//data class LoginRequest(
-//    val email : String,
-//    val password : String
-//)
 
-data class LoginResponse(
+data class ResponseLogin(
     var message : String,
     var operation_status : Int,
     var data : UserData,

@@ -1,8 +1,7 @@
-package com.pnj.pbl.API
+package com.pnj.pbl.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 
 class RetrofitClient {
 
@@ -15,25 +14,16 @@ class RetrofitClient {
             .build()
     }
 
-    fun getDataUser(): ApiLogin{
-        return getRetrofitClient().create(ApiLogin::class.java)
+    fun getDataUser(): Api{
+        return getRetrofitClient().create(Api::class.java)
     }
-//    val loginService: ApiClient by lazy {
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl(BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//        retrofit.create(ApiClient::class.java)
-//    }
 
-//    private fun getRetrofitClient(): Retrofit{
-//        return Retrofit.Builder()
-//            .baseUrl("https://eyecatching-image-ghhipha43a-uc.a.run.app/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//    }
-//
-//    fun getInstance(): ApiLogin{
-//        return getRetrofitClient().create(ApiLogin::class.java)
-//    }
+    fun getAttStts(): Api{
+        return getRetrofitClient().create(Api::class.java)
+    }
+
+    fun getAttLog(): Api{
+        return getRetrofitClient().create(Api::class.java)
+    }
+
 }
