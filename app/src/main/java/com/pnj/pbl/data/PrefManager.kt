@@ -70,11 +70,4 @@ class PrefManager(var context : Context) {
         return pref.getString("token","")
     }
 
-//    .putString("email", response.body()?.data?.user?.email)
-//    .putInt("floor", response.body()?.data?.user?.floor!!)
-//    .putString("name", response.body()?.data?.user?.name)
-//    .putString("profile", response.body()?.data?.user?.profile_pict_url)
-//    .putInt("role", response.body()?.data?.user?.role!!)
-//    .putLong("id", response.body()?.data?.user?.user_id!!)
-//    .putString("jwt_token", response.body()?.token)
 }

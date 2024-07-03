@@ -22,10 +22,10 @@ import retrofit2.Response
 
 class LoginPage : AppCompatActivity() {
 
-    lateinit var btnLogin: Button
-    lateinit var dataEmail: EditText
-    lateinit var dataPassword: EditText
-    lateinit var progBar : ProgressBar
+    private lateinit var btnLogin: Button
+    private lateinit var dataEmail: EditText
+    private lateinit var dataPassword: EditText
+    private lateinit var progBar : ProgressBar
 
     private var emailUser : String = ""
     private var passwordUser : String = ""
@@ -42,8 +42,8 @@ class LoginPage : AppCompatActivity() {
         }
 //      Binding Activity
         btnLogin = findViewById(R.id.btnLogin)
-        dataEmail = findViewById(R.id.getEmail)
-        dataPassword = findViewById(R.id.getPasswd)
+        dataEmail = findViewById(R.id.emailEt)
+        dataPassword = findViewById(R.id.passET)
         progBar = findViewById(R.id.loading)
         profil = PrefManager(this)
 
@@ -91,7 +91,7 @@ class LoginPage : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
-                Log.e("Pesan error", "${t.message}")
+                Log.e("Error Login", "${t.message}")
             }
 
         })
