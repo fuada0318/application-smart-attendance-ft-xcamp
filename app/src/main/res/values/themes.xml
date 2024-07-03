@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Pbl" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Pbl" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="colorPrimary">@color/secondary</item>
@@ -12,11 +12,6 @@
         <item name="android:fontFamily">@font/rubik</item>
 <!--        <item name="buttonStyle">@style/buttonText</item>-->
     </style>
-
-<!--    <style name="buttonText">-->
-<!--        <item name="android:textColor">@color/white</item>-->
-<!--        <item name="android:textColorPrimary">@color/white</item>-->
-<!--    </style>-->
 
     <style name="Theme.Pbl" parent="Base.Theme.Pbl" />
 </resources>

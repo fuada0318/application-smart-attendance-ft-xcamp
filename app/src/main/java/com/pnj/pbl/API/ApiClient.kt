@@ -24,8 +24,8 @@ interface Api {
         @Header("Authorization") tokenAuth:String?
     ):Call<ResponseAttendanceStatus>
 
-    @GET("api/users/attendance-logs")
-    fun getAttendanceRecord(
+    @GET("api/users/me/attendance-logs")
+    fun getAttendanceLogs(
         @Header("Authorization") tokenAuth:String?
     ):Call<ResponseAttendanceLog>
 }

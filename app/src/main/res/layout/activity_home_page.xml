@@ -21,12 +21,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="start"
+            >
 
             <LinearLayout
-                android:layout_width="305dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_weight="1">
 
                 <TextView
                     android:id="@+id/tvGreet"
@@ -53,24 +56,8 @@
                 android:id="@+id/imgProfil"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/avatar" />
-
-            <ImageView
-                android:id="@+id/imgProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:visibility="gone"
-                app:srcCompat="@drawable/avatar" />
-
-            <ImageButton
-                android:id="@+id/imgbProfile"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#00FFFFFF"
-                android:visibility="gone"
-                app:srcCompat="@drawable/avatar" />
+                android:src="@drawable/avatar"
+                android:layout_gravity="end"/>
 
         </LinearLayout>
 
@@ -157,8 +144,10 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvAttendance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/list_attendance"/>
+
     </LinearLayout>
 
 
