@@ -27,8 +27,8 @@ class LoginPage : AppCompatActivity() {
     private lateinit var dataPassword: EditText
     private lateinit var progBar : ProgressBar
 
-    private var emailUser : String = ""
-    private var passwordUser : String = ""
+    var emailUser : String = ""
+    var passwordUser : String = ""
     private lateinit var profil : PrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,11 +65,12 @@ class LoginPage : AppCompatActivity() {
     }
 
     private fun getLogin() {
-        val api = RetrofitClient().getDataUser()
+        val api = RetrofitClient().getDataAPI()
         api.postLogin(emailUser, passwordUser).enqueue(object : Callback<ResponseLogin> {
             override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
                 if (response.isSuccessful) {
                     profil.setEmail(response.body()!!.data.user.email)
+                    profil.setPassword(passwordUser)
                     profil.setName(response.body()!!.data.user.name)
                     profil.setProfile(response.body()!!.data.user.profile_pict_url)
                     profil.setId(response.body()!!.data.user.user_id)
@@ -98,7 +99,7 @@ class LoginPage : AppCompatActivity() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(this@LoginPage, message, Toast.LENGTH_LONG).show()
+        Toast.makeText(this@LoginPage, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun isValidEmail(email: String): Boolean {

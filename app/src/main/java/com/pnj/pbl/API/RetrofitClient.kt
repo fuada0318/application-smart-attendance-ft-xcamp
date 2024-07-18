@@ -14,16 +14,8 @@ class RetrofitClient {
             .build()
     }
 
-    fun getDataUser(): Api{
-        return getRetrofitClient().create(Api::class.java)
-    }
-
-    fun getAttStts(): Api{
-        return getRetrofitClient().create(Api::class.java)
-    }
-
-    fun getAttLog(): Api{
-        return getRetrofitClient().create(Api::class.java)
+    fun getDataAPI(): ApiClient{
+        return getRetrofitClient().create(ApiClient::class.java)
     }
 
 }
