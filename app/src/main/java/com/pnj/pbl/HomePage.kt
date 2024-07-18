@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.pnj.pbl.adapter.AttLogAdapter
+import com.pnj.pbl.adapter.HomeLogAdapter
 import com.pnj.pbl.api.RetrofitClient
 import com.pnj.pbl.data.PrefManager
 import com.pnj.pbl.data.ResponseAttendanceLog
@@ -34,14 +34,14 @@ import java.util.Locale
 class HomePage : AppCompatActivity() {
     private lateinit var btnView: Button
     private lateinit var swipeLayout: SwipeRefreshLayout
-    private lateinit var rcvAtt:RecyclerView
+    private lateinit var rcvAtt: RecyclerView
     private lateinit var imgProfile: CircleImageView
     private lateinit var imgStatus: ImageView
     private lateinit var tvStatus: TextView
 
-    private var arrayAtt:ArrayList<ResponseAttendanceLog.DataAtt> = ArrayList()
-    private var rcvAdapter:AttLogAdapter = AttLogAdapter(arrayAtt)
-    private lateinit var profil : PrefManager
+    private var arrayAtt: ArrayList<ResponseAttendanceLog.DataAtt> = ArrayList()
+    private var rcvAdapter: HomeLogAdapter = HomeLogAdapter(arrayAtt)
+    private lateinit var profil: PrefManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,9 +70,9 @@ class HomePage : AppCompatActivity() {
 //      Greetings
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val greetingText: String = when (currentHour) {
-            in 5..10 -> "Good Morning,"
+            in 4..10 -> "Good Morning,"
             in 11..14 -> "Good Afternoon,"
-            in 15..18 -> "Good Evening,"
+            in 15..19 -> "Good Evening,"
             else -> "Good Night,"
         }
         tvGreet.text = greetingText
@@ -82,7 +82,11 @@ class HomePage : AppCompatActivity() {
         Picasso.get().load(profil.getProfile()).into(imgProfile)
 
         imgProfile.setOnClickListener {
-            startActivity(Intent(this,ProfilePage::class.java))
+//            startActivity(Intent(this, ProfilePage::class.java))
+            val intent = Intent(this, ProfilePage::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
         }
 
 //      Date
@@ -96,7 +100,10 @@ class HomePage : AppCompatActivity() {
 
 //      ViewAll
         btnView.setOnClickListener {
-            startActivity(Intent(this,AttendanceLog::class.java))
+            val intent = Intent(this, AttendanceLog::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
         }
 
 //      Attendance Logs
@@ -111,14 +118,20 @@ class HomePage : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkSession()
+    }
+
     fun formatDate(date: Date): String {
         val formatter = SimpleDateFormat("EEE, dd MMM yyyy", Locale.getDefault())
         return formatter.format(date)
     }
 
-    private fun refreshPage(token : String){
+    private fun refreshPage(token: String) {
         swipeLayout.isRefreshing = true
         swipeLayout.postDelayed({
+            Picasso.get().load(profil.getProfile()).into(imgProfile)
             getAttendanceLog(token)
             getAttendanceStts(token)
 
@@ -126,28 +139,33 @@ class HomePage : AppCompatActivity() {
         }, 3000)
     }
 
-    private fun getAttendanceStts(token : String){
-        val api = RetrofitClient().getAttStts()
-        api.getAttendanceStatus(token).enqueue(object : Callback<ResponseAttendanceStatus>{
+    private fun getAttendanceStts(token: String) {
+        val api = RetrofitClient().getDataAPI()
+        api.getAttendanceStatus(token).enqueue(object : Callback<ResponseAttendanceStatus> {
             override fun onResponse(
                 call: Call<ResponseAttendanceStatus>,
                 response: Response<ResponseAttendanceStatus>
             ) {
-                if (response.isSuccessful){
-                    if (response.body()!!.attendance_status == "absent"){
-                        imgStatus.setImageResource(R.drawable.info)
-                        tvStatus.text = "Anda Belum Presensi"
-                    } else{
+                if (response.isSuccessful) {
+                    if (response.body()!!.attendance_status == "present") {
                         imgStatus.setImageResource(R.drawable.done)
                         tvStatus.text = "Anda Sudah Presensi"
+                    } else {
+                        imgStatus.setImageResource(R.drawable.info)
+                        tvStatus.text = "Anda Belum Presensi"
                     }
-                } else{
+                } else {
                     val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
                     val msgErr = jsonObj.getString("message")
                     Log.e("Error Attendance Status", msgErr)
 
-                    logOut()
-                    showToast("Session berakhir, silahkan login ulang")
+                    if (msgErr.contains("NoneType")) {
+                        imgStatus.setImageResource(R.drawable.info)
+                        tvStatus.text = "Anda Belum Presensi"
+                    } else {
+                        logOut()
+                        showToast("Session berakhir, silahkan login ulang")
+                    }
                 }
             }
 
@@ -158,27 +176,35 @@ class HomePage : AppCompatActivity() {
         })
     }
 
-    private fun getAttendanceLog(token : String){
+    private fun getAttendanceLog(token: String) {
         arrayAtt.clear()
-        val getLog = RetrofitClient().getAttLog()
-        getLog.getAttendanceLogs(token).enqueue(object : Callback<ResponseAttendanceLog>{
+        val getLog = RetrofitClient().getDataAPI()
+        getLog.getAttendanceLogs(token).enqueue(object : Callback<ResponseAttendanceLog> {
             override fun onResponse(
                 call: Call<ResponseAttendanceLog>,
                 response: Response<ResponseAttendanceLog>
             ) {
-                if (response.isSuccessful){
-                    for (i in response.body()!!.data){
-                        arrayAtt.add(i)
+                if (response.isSuccessful) {
+                    response.body()?.data?.let { dataList ->
+                        for (i in dataList.reversed()) {
+                            arrayAtt.add(i)
+                        }
                     }
+//                    filterRecentAnnouncements(arrayAtt)
                     rcvAtt.adapter = rcvAdapter
                     rcvAdapter.notifyDataSetChanged()
-                } else{
+                } else {
                     val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
                     val msgErr = jsonObj.getString("message")
                     Log.e("Error Attendance Log", msgErr)
 
-                    logOut()
-                    showToast("Session berakhir, silahkan login ulang")
+                    if (msgErr.contains("NoneType")) {
+                        showToast("Tidak ada data kehadiran")
+                    } else {
+                        logOut()
+                        showToast("Session berakhir, silahkan login ulang")
+                    }
+
                 }
             }
 
@@ -189,13 +215,42 @@ class HomePage : AppCompatActivity() {
         })
     }
 
-    private fun logOut(){
+    private fun logOut() {
         profil.logOut()
-        startActivity(Intent(this,LoginPage::class.java))
+
+        val intent = Intent(this, LoginPage::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+//    private fun filterRecentAnnouncements(announcements: List<ResponseAttendanceLog.DataAtt>): List<ResponseAttendanceLog.DataAtt>{
+//        val sdf = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
+//        val now = Date()
+//        return announcements.filter {
+//            val announcementDate = sdf.parse(it.timestamp)
+//            val diff = now.time - announcementDate.time
+//            diff <= 30 * 60 * 60 * 1000
+//        }.sortedByDescending { it.timestamp }
+//    }
+
+    private fun checkSession() {
+        if (!profil.getLogin()) {
+            logOut()
+        }
     }
+
+    private fun showToast(message: String) {
+
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+    }
+
+//    private fun showToast(message: String, long: Boolean) {
+//        if (long) {
+//            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+//        } else{
+//            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+//        }
+//    }
 }

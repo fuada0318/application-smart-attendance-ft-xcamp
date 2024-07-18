@@ -30,6 +30,10 @@ class PrefManager(var context : Context) {
         editor.putString("email",email)
         editor.commit()
     }
+    fun setPassword(password:String){
+        editor.putString("password",password)
+        editor.commit()
+    }
     fun setName(name:String){
         editor.putString("name",name)
         editor.commit()
@@ -53,6 +57,9 @@ class PrefManager(var context : Context) {
 
     fun getEmail():String?{
         return pref.getString("email","")
+    }
+    fun getPasswd():String?{
+        return pref.getString("password","")
     }
     fun getName():String?{
         return pref.getString("name","")
