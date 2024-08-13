@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -43,7 +44,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.5.0")
     implementation("com.squareup.picasso:picasso:2.8")
     implementation("de.hdodenhof:circleimageview:3.1.0")
-//    implementation("com.android.volley:volley:1.2.1")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation ("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

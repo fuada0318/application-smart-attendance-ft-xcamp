@@ -38,6 +38,7 @@ class HomePage : AppCompatActivity() {
     private lateinit var imgProfile: CircleImageView
     private lateinit var imgStatus: ImageView
     private lateinit var tvStatus: TextView
+    private lateinit var tvTest: TextView
 
     private var arrayAtt: ArrayList<ResponseAttendanceLog.DataAtt> = ArrayList()
     private var rcvAdapter: HomeLogAdapter = HomeLogAdapter(arrayAtt)
@@ -63,9 +64,14 @@ class HomePage : AppCompatActivity() {
         btnView = findViewById(R.id.btnViewAll)
         swipeLayout = findViewById(R.id.main)
         rcvAtt = findViewById(R.id.rcvAttendance)
+        tvTest = findViewById(R.id.testest)
+
 
         profil = PrefManager(this)
         val tokenJWT = "Bearer ${profil.getToken()}"
+
+        tvTest.text = profil.getTokenFCM()
+
 
 //      Greetings
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
@@ -82,7 +88,6 @@ class HomePage : AppCompatActivity() {
         Picasso.get().load(profil.getProfile()).into(imgProfile)
 
         imgProfile.setOnClickListener {
-//            startActivity(Intent(this, ProfilePage::class.java))
             val intent = Intent(this, ProfilePage::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -116,11 +121,6 @@ class HomePage : AppCompatActivity() {
         swipeLayout.setOnRefreshListener {
             refreshPage(tokenJWT)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        checkSession()
     }
 
     fun formatDate(date: Date): String {
@@ -187,16 +187,17 @@ class HomePage : AppCompatActivity() {
                 if (response.isSuccessful) {
                     response.body()?.data?.let { dataList ->
                         for (i in dataList.reversed()) {
-                            arrayAtt.add(i)
+                            if (arrayAtt.size < 5) {
+                                arrayAtt.add(i)
+                            }
                         }
                     }
-//                    filterRecentAnnouncements(arrayAtt)
                     rcvAtt.adapter = rcvAdapter
                     rcvAdapter.notifyDataSetChanged()
                 } else {
                     val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
                     val msgErr = jsonObj.getString("message")
-                    Log.e("Error Attendance Log", msgErr)
+                    Log.e("Error Attendance Home", msgErr)
 
                     if (msgErr.contains("NoneType")) {
                         showToast("Tidak ada data kehadiran")
@@ -209,7 +210,7 @@ class HomePage : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<ResponseAttendanceLog>, t: Throwable) {
-                Log.e("Error Attendance Log", "${t.message}")
+                Log.e("Error Attendance Home", "${t.message}")
             }
 
         })
@@ -224,33 +225,9 @@ class HomePage : AppCompatActivity() {
         finish()
     }
 
-//    private fun filterRecentAnnouncements(announcements: List<ResponseAttendanceLog.DataAtt>): List<ResponseAttendanceLog.DataAtt>{
-//        val sdf = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
-//        val now = Date()
-//        return announcements.filter {
-//            val announcementDate = sdf.parse(it.timestamp)
-//            val diff = now.time - announcementDate.time
-//            diff <= 30 * 60 * 60 * 1000
-//        }.sortedByDescending { it.timestamp }
-//    }
-
-    private fun checkSession() {
-        if (!profil.getLogin()) {
-            logOut()
-        }
-    }
-
     private fun showToast(message: String) {
 
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
     }
-
-//    private fun showToast(message: String, long: Boolean) {
-//        if (long) {
-//            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-//        } else{
-//            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-//        }
-//    }
 }

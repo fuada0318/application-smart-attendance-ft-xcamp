@@ -1,6 +1,12 @@
 package com.pnj.pbl
 
+import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -10,8 +16,11 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.messaging.FirebaseMessaging
 import com.pnj.pbl.api.RetrofitClient
 import com.pnj.pbl.data.PrefManager
 import com.pnj.pbl.data.ResponseLogin
@@ -25,11 +34,11 @@ class LoginPage : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var dataEmail: EditText
     private lateinit var dataPassword: EditText
-    private lateinit var progBar : ProgressBar
+    private lateinit var progBar: ProgressBar
 
-    var emailUser : String = ""
-    var passwordUser : String = ""
-    private lateinit var profil : PrefManager
+    var emailUser: String = ""
+    var passwordUser: String = ""
+    private lateinit var profil: PrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,30 +54,70 @@ class LoginPage : AppCompatActivity() {
         dataEmail = findViewById(R.id.emailEt)
         dataPassword = findViewById(R.id.passET)
         progBar = findViewById(R.id.loading)
+
         profil = PrefManager(this)
+
+
+
+        reqNotifPermission()
+
+        getTokenFcm()
 
         btnLogin.setOnClickListener {
             emailUser = dataEmail.text.toString()
             passwordUser = dataPassword.text.toString()
 
-            if (emailUser.isEmpty() || emailUser == ""){
+            if (emailUser.isEmpty() || emailUser == "") {
                 dataEmail.error = "Email tidak boleh kosong"
-            } else if (!isValidEmail(emailUser)){
+            } else if (!isValidEmail(emailUser)) {
                 dataEmail.error = "Email tidak valid"
-            } else if (passwordUser.isEmpty() || passwordUser == ""){
+            } else if (passwordUser.isEmpty() || passwordUser == "") {
                 dataPassword.error = "Password tidak boleh kosong"
-            } else{
+            } else {
                 progBar.visibility = View.VISIBLE
                 getLogin()
             }
         }
     }
 
+    private fun getTokenFcm() {
+        val token = profil.getTokenFCM()
+        if (token == "") {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    task.result?.let { newToken ->
+                        profil.setTokenFcm(newToken)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun reqNotifPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasPermission) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
+    }
+
     private fun getLogin() {
+
+        val tokenFCM = profil.getTokenFCM()!!
         val api = RetrofitClient().getDataAPI()
-        api.postLogin(emailUser, passwordUser).enqueue(object : Callback<ResponseLogin> {
+        api.postLogin(emailUser, passwordUser, tokenFCM).enqueue(object : Callback<ResponseLogin> {
             override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
                 if (response.isSuccessful) {
+
                     profil.setEmail(response.body()!!.data.user.email)
                     profil.setPassword(passwordUser)
                     profil.setName(response.body()!!.data.user.name)

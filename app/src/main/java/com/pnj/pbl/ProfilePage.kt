@@ -134,7 +134,7 @@ class ProfilePage : AppCompatActivity(), RequestUpdateProfil.UploadCallback {
             }
 
             override fun onFailure(call: Call<ResponseUpdateProfile>, t: Throwable) {
-                Log.e("Error Attendance Log", "${t.message}")
+                Log.e("Error Upload Foto", "${t.message}")
             }
 
         })

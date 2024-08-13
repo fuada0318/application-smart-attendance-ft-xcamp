@@ -32,7 +32,6 @@ class AttendanceLog : AppCompatActivity() {
     private lateinit var tvAutoComplete: AutoCompleteTextView
     private lateinit var tvClock : TextView
     private lateinit var tvLateClock : TextView
-    private lateinit var tvNoClock : TextView
     private lateinit var btnBack : Button
     private lateinit var rcvLogs : RecyclerView
 
@@ -47,7 +46,7 @@ class AttendanceLog : AppCompatActivity() {
         val arrayAdapter = ArrayAdapter(this@AttendanceLog, R.layout.list_dropdown, monTH)
         tvAutoComplete.setAdapter(arrayAdapter)
 
-        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
         tvAutoComplete.setText(monTH[currentMonth], false)
 
         checkSession()
@@ -72,7 +71,6 @@ class AttendanceLog : AppCompatActivity() {
         }
         tvAutoComplete = findViewById(R.id.autoCompleteTV)
         tvClock = findViewById(R.id.tvClockIn)
-        tvNoClock = findViewById(R.id.tvNoClock)
         tvLateClock = findViewById(R.id.tvLateClock)
         btnBack = findViewById(R.id.btnBack1)
         rcvLogs = findViewById(R.id.rcvLogs)
@@ -90,8 +88,7 @@ class AttendanceLog : AppCompatActivity() {
         rcvLogs.apply { layoutManager = LinearLayoutManager(this@AttendanceLog) }
 
         tvAutoComplete.setOnItemClickListener { _, _, position, _ ->
-            val selectedMonth = position + 1 // Convert month position to month number (January = 1, etc.)
-            getAttendance(tokenJWT, selectedMonth)
+            getAttendance(tokenJWT, position)
         }
 
         val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
@@ -103,54 +100,105 @@ class AttendanceLog : AppCompatActivity() {
     private fun getAttendance(token : String, month : Int){
         arrayLogs.clear()
         val apiLog = RetrofitClient().getDataAPI()
-        apiLog.getAttendanceFiltered(token, month).enqueue(object : Callback<ResponseAttendanceFiltered>{
-            override fun onResponse(
-                call: Call<ResponseAttendanceFiltered>,
-                response: Response<ResponseAttendanceFiltered>
-            ) {
-                if (response.isSuccessful){
+        if (month == 0){
+            apiLog.getAttendanceAll(token).enqueue(object : Callback<ResponseAttendanceFiltered>{
+                override fun onResponse(
+                    call: Call<ResponseAttendanceFiltered>,
+                    response: Response<ResponseAttendanceFiltered>
+                ) {
+                    if (response.isSuccessful){
 
-                    response.body()?.data?.let { dataList ->
-                        for (i in dataList.reversed()) {
-                            arrayLogs.add(i)
+                        response.body()?.data?.let { dataList ->
+                            for (i in dataList.reversed()) {
+                                arrayLogs.add(i)
 
+                            }
+                        }
+
+                        tvLateClock.text = rcvAdpt.getItemLate(arrayLogs).toString()
+                        tvClock.text = rcvAdpt.itemCount.toString()
+                        rcvLogs.adapter = rcvAdpt
+                        rcvAdpt.notifyDataSetChanged()
+                    } else{
+                        val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
+                        val msgErr = jsonObj.getString("message")
+                        Log.e("Error Attendance Log", msgErr)
+
+                        if (msgErr.contains("NoneType")) {
+                            showToast("Tidak ada data kehadiran")
+                        } else if (msgErr.contains("not yet available")){
+                            arrayLogs.clear()
+                            tvLateClock.text = 0.toString()
+                            tvClock.text = 0.toString()
+                            rcvAdpt.notifyDataSetChanged()
+                            showToast("Tidak ada data kehadiran")
+                        } else {
+                            profil.logOut()
+
+                            val intent = Intent(this@AttendanceLog, LoginPage::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            finish()
+                            showToast("Session berakhir, silahkan login ulang")
                         }
                     }
+                }
 
-                    tvLateClock.text = rcvAdpt.getItemLate(arrayLogs).toString()
-                    tvClock.text = rcvAdpt.itemCount.toString()
-                    rcvLogs.adapter = rcvAdpt
-                    rcvAdpt.notifyDataSetChanged()
-                } else{
-                    val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
-                    val msgErr = jsonObj.getString("message")
-                    Log.e("Error Attendance Log", msgErr)
+                override fun onFailure(call: Call<ResponseAttendanceFiltered>, t: Throwable) {
+                    Log.e("Error Attendance Log", "${t.message}")
+                }
 
-                    if (msgErr.contains("NoneType")) {
-                        showToast("Tidak ada data kehadiran")
-                    } else if (msgErr.contains("belum tersedia")){
-                        arrayLogs.clear()
-                        tvLateClock.text = 0.toString()
-                        tvClock.text = 0.toString()
+            })
+        } else{
+            apiLog.getAttendanceFiltered(token, month).enqueue(object : Callback<ResponseAttendanceFiltered>{
+                override fun onResponse(
+                    call: Call<ResponseAttendanceFiltered>,
+                    response: Response<ResponseAttendanceFiltered>
+                ) {
+                    if (response.isSuccessful){
+
+                        response.body()?.data?.let { dataList ->
+                            for (i in dataList.reversed()) {
+                                arrayLogs.add(i)
+
+                            }
+                        }
+
+                        tvLateClock.text = rcvAdpt.getItemLate(arrayLogs).toString()
+                        tvClock.text = rcvAdpt.itemCount.toString()
+                        rcvLogs.adapter = rcvAdpt
                         rcvAdpt.notifyDataSetChanged()
-                        showToast("$msgErr")
-                    } else {
-                        profil.logOut()
+                    } else{
+                        val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
+                        val msgErr = jsonObj.getString("message")
+                        Log.e("Error Attendance Log", msgErr)
 
-                        val intent = Intent(this@AttendanceLog, LoginPage::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                        showToast("Session berakhir, silahkan login ulang")
+                        if (msgErr.contains("NoneType")) {
+                            showToast("Tidak ada data kehadiran")
+                        } else if (msgErr.contains("not yet available")){
+                            arrayLogs.clear()
+                            tvLateClock.text = 0.toString()
+                            tvClock.text = 0.toString()
+                            rcvAdpt.notifyDataSetChanged()
+                            showToast("Tidak ada data kehadiran")
+                        } else {
+                            profil.logOut()
+
+                            val intent = Intent(this@AttendanceLog, LoginPage::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                            finish()
+                            showToast("Session berakhir, silahkan login ulang")
+                        }
                     }
                 }
-            }
 
-            override fun onFailure(call: Call<ResponseAttendanceFiltered>, t: Throwable) {
-                Log.e("Error Attendance Log", "${t.message}")
-            }
+                override fun onFailure(call: Call<ResponseAttendanceFiltered>, t: Throwable) {
+                    Log.e("Error Attendance Log", "${t.message}")
+                }
+            })
+        }
 
-        })
 
     }
 

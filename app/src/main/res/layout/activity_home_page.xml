@@ -74,7 +74,7 @@
                     android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="@font/rubik_medium"
                     android:text="Tue, 30 May 2024 (08:00 - 16:00)"
                     android:textColor="#FFFFFF"
@@ -87,7 +87,7 @@
                     android:id="@+id/tvStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="16dp"
                     android:fontFamily="@font/rubik_medium"
                     android:text="Anda Belum Presensi"
                     android:textColor="#FFFFFF"
@@ -109,6 +109,17 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/testest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:fontFamily="monospace"
+            android:text="testestesteIiLl"
+            android:textSize="16sp"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:layout_width="match_parent"
