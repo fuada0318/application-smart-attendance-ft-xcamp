@@ -24,8 +24,8 @@ class HomeLogAdapter (val arrayAtt:ArrayList<ResponseAttendanceLog.DataAtt>):Rec
         val itemList = arrayAtt[position]
 
         val dateTimeParts = itemList.timestamp.split(" ")
-        val date = dateTimeParts.take(4).joinToString(" ") // Taking the first four parts for the date
-        val time = dateTimeParts.last() // The last part is the time
+        val date = dateTimeParts.take(4).joinToString(" ")
+        val time = dateTimeParts.last()
 
         holder.apply {
 

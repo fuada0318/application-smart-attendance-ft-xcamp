@@ -4,7 +4,7 @@
     android:id="@+id/layout_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/ghost_white"
+
     android:orientation="vertical"
 
     android:outlineAmbientShadowColor="@color/ghost_white">

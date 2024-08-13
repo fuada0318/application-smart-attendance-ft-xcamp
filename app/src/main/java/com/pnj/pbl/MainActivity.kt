@@ -1,7 +1,11 @@
 package com.pnj.pbl
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +16,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.messaging.FirebaseMessaging
 import com.pnj.pbl.api.RetrofitClient
 import com.pnj.pbl.data.PrefManager
 import com.pnj.pbl.data.ResponseLogin
@@ -22,7 +27,7 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var profil : PrefManager
+    private lateinit var profil: PrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,55 +38,62 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        profil = PrefManager(this)
         checkSession()
     }
 
-    private fun checkSession(){
-
-        profil = PrefManager(this)
+    private fun checkSession() {
 
         val email = profil.getEmail().toString()
         val pwd = profil.getPasswd().toString()
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (profil.getLogin()){
-                loginUlang(email,pwd)
-                val pindahHalaman = Intent(this,HomePage::class.java)
+            val intent = intent
+            if (intent.action == "OPEN_ATTENDANCE_ACTIVITY") {
+                val pindahHalaman = Intent(this, ConfirmAttendance::class.java)
+                pindahHalaman.action = "OPEN_ATTENDANCE_ACTIVITY"
                 startActivity(pindahHalaman)
                 finish()
-            }else{
-                val pindahHalaman = Intent(applicationContext,LoginPage::class.java)
-                startActivity(pindahHalaman)
-                finish()
-            }
-        },1500)
-    }
-
-    private fun loginUlang(email:String, pwd:String){
-        val api = RetrofitClient().getDataAPI()
-        api.postLogin(email,pwd).enqueue(object : Callback<ResponseLogin>{
-            override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
-                if (response.isSuccessful){
-                    profil.setEmail(response.body()!!.data.user.email)
-                    profil.setPassword(pwd)
-                    profil.setName(response.body()!!.data.user.name)
-                    profil.setProfile(response.body()!!.data.user.profile_pict_url)
-                    profil.setId(response.body()!!.data.user.user_id)
-                    profil.setFloor(response.body()!!.data.user.floor)
-                    profil.setToken(response.body()!!.token)
-                    profil.setLogin(true)
-                } else{
-//                    val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
-//                    val msgerr = jsonObj.getString("message")
-//                    Toast.makeText(this@MainActivity, "$msgerr", Toast.LENGTH_SHORT).show()
+            } else {
+                if (profil.getLogin()) {
+//                loginUlang(email,pwd)
+                    val pindahHalaman = Intent(this, HomePage::class.java)
+                    startActivity(pindahHalaman)
+                    finish()
+                } else {
+                    val pindahHalaman = Intent(applicationContext, LoginPage::class.java)
+                    startActivity(pindahHalaman)
+                    finish()
                 }
-
             }
-
-            override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
-                Log.e("Error Login", "${t.message}")
-            }
-
-        })
+        }, 1500)
     }
+
+//    private fun loginUlang(email: String, pwd: String) {
+//        val api = RetrofitClient().getDataAPI()
+//        api.postLogin(email, pwd).enqueue(object : Callback<ResponseLogin> {
+//            override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
+//                if (response.isSuccessful) {
+//                    profil.setEmail(response.body()!!.data.user.email)
+//                    profil.setPassword(pwd)
+//                    profil.setName(response.body()!!.data.user.name)
+//                    profil.setProfile(response.body()!!.data.user.profile_pict_url)
+//                    profil.setId(response.body()!!.data.user.user_id)
+//                    profil.setFloor(response.body()!!.data.user.floor)
+//                    profil.setToken(response.body()!!.token)
+//                    profil.setLogin(true)
+//                } else {
+////                    val jsonObj = JSONObject(response.errorBody()!!.charStream().readText())
+////                    val msgerr = jsonObj.getString("message")
+////                    Toast.makeText(this@MainActivity, "$msgerr", Toast.LENGTH_SHORT).show()
+//                }
+//
+//            }
+//
+//            override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
+//                Log.e("Error Login", "${t.message}")
+//            }
+//
+//        })
+//    }
 }

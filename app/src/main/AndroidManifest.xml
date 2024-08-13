@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +16,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Pbl"
         android:usesCleartextTraffic="true"
-        tools:targetApi="31">
+        >
+        <activity android:name=".ConfirmAttendance"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="OPEN_ATTENDANCE_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ProfilePage"
             android:exported="false" />
@@ -38,6 +46,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".PushNotificationService"
+            android:exported="false"
+            android:permission="com.google.android.c2dm.permission.RECEIVE">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
 
         <meta-data
             android:name="preloaded_fonts"

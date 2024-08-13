@@ -45,6 +45,7 @@
     <string name="back"><![CDATA[<]]></string>
 
     <string-array name="month">
+        <item>All</item>
         <item>January</item>
         <item>February</item>
         <item>March</item>

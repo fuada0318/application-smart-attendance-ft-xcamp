@@ -54,6 +54,10 @@ class PrefManager(var context : Context) {
         editor.putString("token",token)
         editor.commit()
     }
+    fun setTokenFcm(token: String) {
+        editor.putString("fcm_token", token)
+        editor.apply()
+    }
 
     fun getEmail():String?{
         return pref.getString("email","")
@@ -75,6 +79,9 @@ class PrefManager(var context : Context) {
     }
     fun getToken():String?{
         return pref.getString("token","")
+    }
+    fun getTokenFCM(): String? {
+        return pref.getString("fcm_token", "")
     }
 
 }

@@ -52,8 +52,8 @@ class LogAdapter(val arrayLog:ArrayList<ResponseAttendanceFiltered.DataAtt>): Re
         val itemList = arrayLog[position]
 
         val dateTimeParts = itemList.timestamp.split(" ")
-        val date = dateTimeParts.take(4).joinToString(" ") // Taking the first four parts for the date
-        val time = dateTimeParts.last() // The last part is the time
+        val date = dateTimeParts.take(4).joinToString(" ")
+        val time = dateTimeParts.last()
 
         val lateTime = SimpleDateFormat("HH:mm", Locale.getDefault()).parse("08:30")
         var lateCount = 0
